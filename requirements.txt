@@ -1,0 +1,3 @@
+requests==2.31.0
+beautifulsoup4==4.12.2
+# lxml==4.9.3  # 註解掉因為可能需要編譯器，改用內建 html.parser

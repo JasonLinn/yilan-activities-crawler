@@ -1,0 +1,97 @@
+# .github/workflows/crawler.yml
+name: 宜蘭活動爬蟲
+
+on:
+  schedule:
+    # 每天 UTC 01:00 和 13:00 執行 (台灣時間 09:00 和 21:00)
+    - cron: '0 1,13 * * *'
+  
+  # 允許手動觸發
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: '啟用除錯模式'
+        type: boolean
+        default: false
+
+jobs:
+  crawl-activities:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write  # 允許推送到 repository
+    
+    steps:
+      - name: 📥 取得程式碼
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: 🐍 設定 Python 環境
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+      
+      - name: 📦 安裝相依套件
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: 🕷️ 執行爬蟲
+        run: |
+          python crawler.py
+        env:
+          PYTHONIOENCODING: utf-8
+        timeout-minutes: 10
+      
+      - name: 📊 顯示爬取結果
+        run: |
+          echo "=== 爬取結果 ==="
+          if [ -f "data/latest_activities.json" ]; then
+            echo "✅ 成功爬取資料"
+            python -c "import json; data = json.load(open('data/latest_activities.json', 'r', encoding='utf-8')); print(f'📅 更新時間: {data[\"update_time\"]}'); print(f'📝 活動數量: {data[\"total_count\"]} 筆')"
+          else
+            echo "❌ 未找到爬取結果"
+          fi
+      
+      - name: 💾 提交變更
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action Bot"
+          git add -A
+          
+          if git diff --staged --quiet; then
+            echo "📄 無新資料，跳過提交"
+          else
+            git commit -m "🤖 自動更新活動資料 - $(date '+%Y-%m-%d %H:%M:%S')"
+            git push
+            echo "✅ 資料已更新並推送"
+          fi
+      
+      - name: 📈 上傳爬取統計
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: crawl-logs-${{ github.run_number }}
+          path: |
+            data/
+            README.md
+          retention-days: 7
+
+  # 健康檢查任務
+  health-check:
+    needs: crawl-activities
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: 📋 檢查爬蟲狀態
+        run: |
+          if [ "${{ needs.crawl-activities.result }}" == "success" ]; then
+            echo "✅ 爬蟲執行成功"
+          else
+            echo "❌ 爬蟲執行失敗"
+            echo "請檢查日誌找出問題原因"
+            exit 1
+          fi
