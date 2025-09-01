@@ -9,6 +9,59 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+def get_activity_details(session, activity_url):
+    """獲取活動詳細資訊，包括圖片"""
+    try:
+        response = session.get(activity_url, timeout=30)
+        response.encoding = 'utf-8'
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        details = {}
+        
+        # 尋找活動圖片
+        images = []
+        img_tags = soup.find_all('img')
+        
+        for img in img_tags:
+            src = img.get('src', '')
+            alt = img.get('alt', '')
+            
+            # 只收集上傳的活動圖片
+            if 'upload/event/' in src:
+                if src.startswith('/'):
+                    full_url = f"https://yilanart.ilccb.gov.tw{src}"
+                elif not src.startswith('http'):
+                    full_url = f"https://yilanart.ilccb.gov.tw/{src}"
+                else:
+                    full_url = src
+                
+                images.append({
+                    'url': full_url,
+                    'alt': alt or '活動圖片'
+                })
+        
+        details['images'] = images
+        
+        # 嘗試獲取更詳細的活動描述
+        content_div = soup.find('div', class_='content')
+        if content_div:
+            # 尋找活動描述文字
+            text_elements = content_div.find_all(['p', 'div'], string=True)
+            description_parts = []
+            for elem in text_elements:
+                text = elem.get_text(strip=True)
+                if len(text) > 20 and '活動' in text:  # 可能是活動描述
+                    description_parts.append(text)
+            
+            if description_parts:
+                details['description'] = ' '.join(description_parts[:2])  # 取前兩段
+        
+        return details
+        
+    except Exception as e:
+        logger.warning(f"獲取活動詳情失敗 {activity_url}: {e}")
+        return {'images': [], 'description': ''}
+
 def crawl_yilan_activities():
     """爬取宜蘭縣文化局活動資訊"""
     url = "https://yilanart.ilccb.gov.tw/index.php?inter=activity"
@@ -103,6 +156,11 @@ def crawl_yilan_activities():
                         else:
                             activity['url'] = href
                         
+                        # 獲取活動詳細資訊（包括圖片）
+                        logger.info(f"獲取活動詳情: {activity.get('title', '未知活動')}")
+                        details = get_activity_details(session, activity['url'])
+                        activity.update(details)
+                        
                         # 添加爬取時間
                         activity['crawl_time'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                         
@@ -181,8 +239,19 @@ def generate_readme():
                 readme_content += f"- **時間**: {activity['date']}\n"
             if activity.get('location'):
                 readme_content += f"- **地點**: {activity['location']}\n"
+            if activity.get('category'):
+                readme_content += f"- **類型**: {activity['category']}\n"
+            if activity.get('price'):
+                readme_content += f"- **票價**: {activity['price']}\n"
             if activity.get('url'):
                 readme_content += f"- **連結**: [{activity['url']}]({activity['url']})\n"
+            
+            # 添加圖片
+            if activity.get('images') and len(activity['images']) > 0:
+                readme_content += f"- **圖片**:\n"
+                for img in activity['images'][:2]:  # 最多顯示2張圖片
+                    readme_content += f"  - ![{img.get('alt', '活動圖片')}]({img['url']})\n"
+            
             readme_content += "\n"
         
         readme_content += f"""
