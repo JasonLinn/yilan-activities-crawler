@@ -4,15 +4,84 @@ import json
 import os
 from datetime import datetime
 import logging
+import time
+import random
+from urllib3.util.retry import Retry
+from requests.adapters import HTTPAdapter
 
 # 設定日誌
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+def create_session():
+    """創建一個配置好的 requests session"""
+    session = requests.Session()
+    
+    # 設定重試策略
+    retry_strategy = Retry(
+        total=3,  # 總重試次數
+        backoff_factor=1,  # 退避因子
+        status_forcelist=[429, 500, 502, 503, 504],  # 需要重試的HTTP狀態碼
+        allowed_methods=["HEAD", "GET", "OPTIONS"]  # 允許重試的HTTP方法
+    )
+    
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
+    
+    # 設定 headers
+    session.headers.update({
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+    })
+    
+    return session
+
+def make_request_with_retry(session, url, max_retries=3, base_timeout=10):
+    """發送請求並處理重試邏輯"""
+    for attempt in range(max_retries):
+        try:
+            # 計算當前嘗試的超時時間（指數退避）
+            timeout = base_timeout * (2 ** attempt)
+            
+            logger.info(f"嘗試第 {attempt + 1} 次請求 {url} (超時: {timeout}秒)")
+            
+            response = session.get(url, timeout=timeout)
+            response.raise_for_status()  # 檢查HTTP錯誤
+            return response
+            
+        except requests.exceptions.Timeout:
+            logger.warning(f"第 {attempt + 1} 次請求超時")
+            if attempt < max_retries - 1:
+                wait_time = random.uniform(1, 3) * (attempt + 1)
+                logger.info(f"等待 {wait_time:.1f} 秒後重試...")
+                time.sleep(wait_time)
+            
+        except requests.exceptions.ConnectionError as e:
+            logger.warning(f"第 {attempt + 1} 次連接錯誤: {e}")
+            if attempt < max_retries - 1:
+                wait_time = random.uniform(2, 5) * (attempt + 1)
+                logger.info(f"等待 {wait_time:.1f} 秒後重試...")
+                time.sleep(wait_time)
+                
+        except requests.exceptions.RequestException as e:
+            logger.warning(f"第 {attempt + 1} 次請求發生錯誤: {e}")
+            if attempt < max_retries - 1:
+                wait_time = random.uniform(1, 3) * (attempt + 1)
+                logger.info(f"等待 {wait_time:.1f} 秒後重試...")
+                time.sleep(wait_time)
+    
+    # 所有重試都失敗
+    raise requests.exceptions.RequestException(f"經過 {max_retries} 次重試後仍無法連接到 {url}")
+
 def get_activity_details(session, activity_url):
     """獲取活動詳細資訊，包括圖片"""
     try:
-        response = session.get(activity_url, timeout=30)
+        response = make_request_with_retry(session, activity_url, max_retries=2, base_timeout=15)
         response.encoding = 'utf-8'
         soup = BeautifulSoup(response.text, 'html.parser')
         
@@ -66,19 +135,12 @@ def crawl_yilan_activities():
     """爬取宜蘭縣文化局活動資訊"""
     url = "https://yilanart.ilccb.gov.tw/index.php?inter=activity"
     
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1',
-    }
-    
     try:
         logger.info(f"開始爬取: {url}")
         
-        session = requests.Session()
+        # 使用新的 session 創建函數
+        session = create_session()
+        
         # 忽略 SSL 憑證驗證問題
         session.verify = False
         
@@ -86,8 +148,8 @@ def crawl_yilan_activities():
         import urllib3
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         
-        response = session.get(url, headers=headers, timeout=30)
-        response.raise_for_status()
+        # 使用新的重試請求函數
+        response = make_request_with_retry(session, url, max_retries=3, base_timeout=10)
         
         # 設定正確的編碼
         response.encoding = 'utf-8'
@@ -274,10 +336,36 @@ def generate_readme():
     except Exception as e:
         logger.warning(f"生成 README 時發生錯誤: {e}")
 
+def create_fallback_data():
+    """創建備用資料檔案，當爬取失敗時使用"""
+    fallback_data = {
+        'update_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'total_count': 0,
+        'activities': [],
+        'status': 'failed',
+        'message': '無法連接到宜蘭文化局網站，請稍後再試'
+    }
+    
+    output_dir = 'data'
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # 只有在沒有任何資料時才創建備用檔案
+    latest_file = f'{output_dir}/latest_activities.json'
+    if not os.path.exists(latest_file):
+        with open(latest_file, 'w', encoding='utf-8') as f:
+            json.dump(fallback_data, f, ensure_ascii=False, indent=2)
+        logger.info("已創建備用資料檔案")
+    
+    return fallback_data
+
 if __name__ == "__main__":
+    success = False
+    activities = []
+    
     try:
         activities = crawl_yilan_activities()
         generate_readme()
+        success = True
         
         print(f"✅ 爬取完成，共 {len(activities)} 筆活動資料")
         
@@ -289,6 +377,33 @@ if __name__ == "__main__":
             if activity.get('location'):
                 print(f"   地點: {activity['location']}")
                 
+    except requests.exceptions.RequestException as e:
+        logger.error(f"網路連線問題: {e}")
+        print(f"⚠️ 網路連線失敗，這可能是暫時性問題")
+        print("建議稍後再試，或檢查網站是否正常運作")
+        
+        # 創建備用資料
+        fallback_data = create_fallback_data()
+        
+        # GitHub Actions 環境下不要直接失敗，而是提供有用的資訊
+        if os.getenv('GITHUB_ACTIONS'):
+            print("🔄 這是 GitHub Actions 環境，將繼續執行而不中斷工作流程")
+            print(f"📝 下次排程執行時間會自動重試")
+            exit(0)  # 不讓 GitHub Actions 失敗
+        else:
+            exit(1)  # 本地執行時顯示錯誤
+            
     except Exception as e:
+        logger.error(f"意外錯誤: {e}")
         print(f"❌ 執行失敗: {e}")
-        exit(1)
+        
+        # 創建備用資料
+        fallback_data = create_fallback_data()
+        
+        # GitHub Actions 環境下提供更多資訊
+        if os.getenv('GITHUB_ACTIONS'):
+            print("🔄 這是 GitHub Actions 環境")
+            print(f"📝 錯誤詳情已記錄，下次排程執行時會自動重試")
+            exit(0)  # 不讓 GitHub Actions 失敗
+        else:
+            exit(1)  # 本地執行時顯示錯誤
