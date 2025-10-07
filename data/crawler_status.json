@@ -1,0 +1,8 @@
+{
+  "timestamp": "2025-10-07 15:14:12",
+  "success": false,
+  "activities_count": 0,
+  "error_message": "網路連線問題: 經過 3 次重試後仍無法連接到 https://yilanart.ilccb.gov.tw/index.php?inter=activity",
+  "environment": "github_actions",
+  "last_success": "2025-10-07 22:44:04"
+}
