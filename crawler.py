@@ -17,31 +17,39 @@ def create_session():
     """創建一個配置好的 requests session"""
     session = requests.Session()
     
-    # 設定重試策略
+    # 設定重試策略 - 減少重試次數以避免被識別為攻擊
     retry_strategy = Retry(
-        total=3,  # 總重試次數
-        backoff_factor=1,  # 退避因子
-        status_forcelist=[429, 500, 502, 503, 504],  # 需要重試的HTTP狀態碼
-        allowed_methods=["HEAD", "GET", "OPTIONS"]  # 允許重試的HTTP方法
+        total=2,  # 減少到2次重試
+        backoff_factor=2,  # 增加退避時間
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["HEAD", "GET", "OPTIONS"]
     )
     
-    adapter = HTTPAdapter(max_retries=retry_strategy)
+    adapter = HTTPAdapter(max_retries=retry_strategy, pool_connections=1, pool_maxsize=1)
     session.mount("http://", adapter)
     session.mount("https://", adapter)
     
-    # 設定 headers
+    # 設定更真實的瀏覽器 headers
     session.headers.update({
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        'Accept-Language': 'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7',
         'Accept-Encoding': 'gzip, deflate, br',
         'Connection': 'keep-alive',
         'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'none',
+        'Sec-Fetch-User': '?1',
+        'sec-ch-ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"Windows"',
+        'Cache-Control': 'max-age=0',
     })
     
     return session
 
-def make_request_with_retry(session, url, max_retries=3, base_timeout=10):
+def make_request_with_retry(session, url, max_retries=3, base_timeout=15):
     """發送請求並處理重試邏輯"""
     
     # 先進行簡單的連通性測試
@@ -55,45 +63,52 @@ def make_request_with_retry(session, url, max_retries=3, base_timeout=10):
     except Exception as e:
         logger.warning(f"⚠️ DNS 或網路連通性問題: {e}")
     
+    # 添加初始延遲，模擬人類行為
+    initial_delay = random.uniform(1, 3)
+    logger.info(f"等待 {initial_delay:.1f} 秒後開始請求（模擬人類行為）...")
+    time.sleep(initial_delay)
+    
     for attempt in range(max_retries):
         try:
-            # 計算當前嘗試的超時時間（指數退避）
-            timeout = base_timeout * (2 ** attempt)
+            # 使用較長的初始超時時間
+            timeout = base_timeout * (1.5 ** attempt)  # 15s -> 22.5s -> 33.75s
             
-            logger.info(f"嘗試第 {attempt + 1} 次請求 {url} (超時: {timeout}秒)")
+            logger.info(f"嘗試第 {attempt + 1} 次請求 {url} (超時: {timeout:.1f}秒)")
             
-            # 在每次重試時添加不同的 headers 來避免被攔截
+            # 在每次重試時輕微調整 headers
             if attempt > 0:
+                # 模擬刷新頁面的行為
                 session.headers.update({
-                    'Cache-Control': 'no-cache',
+                    'Cache-Control': 'no-cache' if attempt == 1 else 'max-age=0',
                     'Pragma': 'no-cache',
-                    'X-Requested-With': 'XMLHttpRequest' if attempt == 2 else 'Crawler',
                 })
             
-            response = session.get(url, timeout=timeout)
-            response.raise_for_status()  # 檢查HTTP錯誤
+            # 發送請求，增加 connect timeout
+            response = session.get(url, timeout=(timeout, timeout * 2))
+            response.raise_for_status()
             
-            logger.info(f"✅ 請求成功，響應大小: {len(response.content)} bytes")
+            logger.info(f"✅ 請求成功，響應大小: {len(response.content)} bytes，狀態碼: {response.status_code}")
             return response
             
-        except requests.exceptions.Timeout:
-            logger.warning(f"第 {attempt + 1} 次請求超時")
+        except requests.exceptions.Timeout as e:
+            logger.warning(f"第 {attempt + 1} 次請求超時: {type(e).__name__}")
             if attempt < max_retries - 1:
-                wait_time = random.uniform(1, 3) * (attempt + 1)
+                # 增加等待時間
+                wait_time = random.uniform(3, 7) * (attempt + 1)
                 logger.info(f"等待 {wait_time:.1f} 秒後重試...")
                 time.sleep(wait_time)
             
         except requests.exceptions.ConnectionError as e:
-            logger.warning(f"第 {attempt + 1} 次連接錯誤: {e}")
+            logger.warning(f"第 {attempt + 1} 次連接錯誤: {str(e)[:100]}")
             if attempt < max_retries - 1:
-                wait_time = random.uniform(2, 5) * (attempt + 1)
+                wait_time = random.uniform(5, 10) * (attempt + 1)
                 logger.info(f"等待 {wait_time:.1f} 秒後重試...")
                 time.sleep(wait_time)
                 
         except requests.exceptions.RequestException as e:
-            logger.warning(f"第 {attempt + 1} 次請求發生錯誤: {e}")
+            logger.warning(f"第 {attempt + 1} 次請求發生錯誤: {str(e)[:100]}")
             if attempt < max_retries - 1:
-                wait_time = random.uniform(1, 3) * (attempt + 1)
+                wait_time = random.uniform(3, 6) * (attempt + 1)
                 logger.info(f"等待 {wait_time:.1f} 秒後重試...")
                 time.sleep(wait_time)
     
@@ -170,8 +185,8 @@ def crawl_yilan_activities():
         import urllib3
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         
-        # 使用新的重試請求函數
-        response = make_request_with_retry(session, url, max_retries=3, base_timeout=10)
+        # 使用新的重試請求函數，增加基礎超時時間
+        response = make_request_with_retry(session, url, max_retries=3, base_timeout=20)
         
         # 設定正確的編碼
         response.encoding = 'utf-8'

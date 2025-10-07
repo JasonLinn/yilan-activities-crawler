@@ -43,7 +43,7 @@ jobs:
           python crawler.py
         env:
           PYTHONIOENCODING: utf-8
-        timeout-minutes: 10
+        timeout-minutes: 15
       
       - name: 📊 顯示爬取結果
         run: |
