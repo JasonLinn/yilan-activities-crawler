@@ -43,6 +43,18 @@ def create_session():
 
 def make_request_with_retry(session, url, max_retries=3, base_timeout=10):
     """發送請求並處理重試邏輯"""
+    
+    # 先進行簡單的連通性測試
+    try:
+        import socket
+        hostname = url.split('//')[1].split('/')[0]
+        logger.info(f"測試網域連通性: {hostname}")
+        socket.setdefaulttimeout(5)
+        socket.getaddrinfo(hostname, 443)
+        logger.info(f"✅ DNS 解析成功: {hostname}")
+    except Exception as e:
+        logger.warning(f"⚠️ DNS 或網路連通性問題: {e}")
+    
     for attempt in range(max_retries):
         try:
             # 計算當前嘗試的超時時間（指數退避）
@@ -50,8 +62,18 @@ def make_request_with_retry(session, url, max_retries=3, base_timeout=10):
             
             logger.info(f"嘗試第 {attempt + 1} 次請求 {url} (超時: {timeout}秒)")
             
+            # 在每次重試時添加不同的 headers 來避免被攔截
+            if attempt > 0:
+                session.headers.update({
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache',
+                    'X-Requested-With': 'XMLHttpRequest' if attempt == 2 else 'Crawler',
+                })
+            
             response = session.get(url, timeout=timeout)
             response.raise_for_status()  # 檢查HTTP錯誤
+            
+            logger.info(f"✅ 請求成功，響應大小: {len(response.content)} bytes")
             return response
             
         except requests.exceptions.Timeout:
@@ -343,7 +365,8 @@ def create_fallback_data():
         'total_count': 0,
         'activities': [],
         'status': 'failed',
-        'message': '無法連接到宜蘭文化局網站，請稍後再試'
+        'message': '無法連接到宜蘭文化局網站，請稍後再試',
+        'last_success': get_last_success_time()
     }
     
     output_dir = 'data'
@@ -358,14 +381,53 @@ def create_fallback_data():
     
     return fallback_data
 
+def get_last_success_time():
+    """獲取上次成功爬取的時間"""
+    try:
+        latest_file = 'data/latest_activities.json'
+        if os.path.exists(latest_file):
+            with open(latest_file, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                if data.get('status') != 'failed' and data.get('total_count', 0) > 0:
+                    return data.get('update_time', '未知')
+        return '從未成功'
+    except:
+        return '未知'
+
+def create_status_report(success, activities_count, error_msg=None):
+    """創建狀態報告"""
+    status_data = {
+        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'success': success,
+        'activities_count': activities_count,
+        'error_message': error_msg,
+        'environment': 'github_actions' if os.getenv('GITHUB_ACTIONS') else 'local',
+        'last_success': get_last_success_time() if not success else datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    }
+    
+    # 保存狀態報告
+    try:
+        os.makedirs('data', exist_ok=True)
+        with open('data/crawler_status.json', 'w', encoding='utf-8') as f:
+            json.dump(status_data, f, ensure_ascii=False, indent=2)
+        logger.info(f"狀態報告已保存: {'成功' if success else '失敗'}")
+    except Exception as e:
+        logger.warning(f"無法保存狀態報告: {e}")
+    
+    return status_data
+
 if __name__ == "__main__":
     success = False
     activities = []
+    error_message = None
     
     try:
         activities = crawl_yilan_activities()
         generate_readme()
         success = True
+        
+        # 創建成功狀態報告
+        create_status_report(True, len(activities))
         
         print(f"✅ 爬取完成，共 {len(activities)} 筆活動資料")
         
@@ -378,7 +440,12 @@ if __name__ == "__main__":
                 print(f"   地點: {activity['location']}")
                 
     except requests.exceptions.RequestException as e:
-        logger.error(f"網路連線問題: {e}")
+        error_message = f"網路連線問題: {str(e)}"
+        logger.error(error_message)
+        
+        # 創建失敗狀態報告
+        create_status_report(False, 0, error_message)
+        
         print(f"⚠️ 網路連線失敗，這可能是暫時性問題")
         print("建議稍後再試，或檢查網站是否正常運作")
         
@@ -389,12 +456,19 @@ if __name__ == "__main__":
         if os.getenv('GITHUB_ACTIONS'):
             print("🔄 這是 GitHub Actions 環境，將繼續執行而不中斷工作流程")
             print(f"📝 下次排程執行時間會自動重試")
+            last_success = get_last_success_time()
+            print(f"📅 上次成功時間: {last_success}")
             exit(0)  # 不讓 GitHub Actions 失敗
         else:
             exit(1)  # 本地執行時顯示錯誤
             
     except Exception as e:
-        logger.error(f"意外錯誤: {e}")
+        error_message = f"意外錯誤: {str(e)}"
+        logger.error(error_message)
+        
+        # 創建失敗狀態報告
+        create_status_report(False, 0, error_message)
+        
         print(f"❌ 執行失敗: {e}")
         
         # 創建備用資料
@@ -404,6 +478,8 @@ if __name__ == "__main__":
         if os.getenv('GITHUB_ACTIONS'):
             print("🔄 這是 GitHub Actions 環境")
             print(f"📝 錯誤詳情已記錄，下次排程執行時會自動重試")
+            last_success = get_last_success_time()
+            print(f"📅 上次成功時間: {last_success}")
             exit(0)  # 不讓 GitHub Actions 失敗
         else:
             exit(1)  # 本地執行時顯示錯誤

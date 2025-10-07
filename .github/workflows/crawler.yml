@@ -78,6 +78,17 @@ jobs:
             data/
             README.md
           retention-days: 7
+      
+      - name: 📊 顯示爬取狀態
+        if: always()
+        run: |
+          echo "=== 爬取狀態報告 ==="
+          if [ -f "data/crawler_status.json" ]; then
+            echo "📋 狀態檔案存在，顯示內容:"
+            cat data/crawler_status.json
+          else
+            echo "⚠️ 未找到狀態檔案"
+          fi
 
   # 健康檢查任務
   health-check:

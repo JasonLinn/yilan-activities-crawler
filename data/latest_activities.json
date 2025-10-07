@@ -1,5 +1,5 @@
 {
-  "update_time": "2025-09-01 13:39:05",
+  "update_time": "2025-10-07 22:44:04",
   "total_count": 12,
   "activities": [
     {
@@ -10,6 +10,10 @@
       "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=532",
       "images": [
         {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202509011433159470.png",
+          "alt": "台語家庭活動推廣圖示"
+        },
+        {
           "url": "https://yilanart.ilccb.gov.tw/upload/event/202505191423185146.jpg",
           "alt": "宣傳圖片01圖示"
         },
@@ -18,7 +22,7 @@
           "alt": "宣傳圖片02圖示"
         }
       ],
-      "crawl_time": "2025-09-01 13:39:04"
+      "crawl_time": "2025-10-07 22:44:03"
     },
     {
       "title": "(非文化中心)202508.09Sat11.23Sun「我回來了」田名璋影像裝置展",
@@ -32,141 +36,218 @@
           "alt": "「我回來了」田名璋影像裝置展圖示"
         }
       ],
-      "crawl_time": "2025-09-01 13:39:04"
+      "crawl_time": "2025-10-07 22:44:03"
     },
     {
-      "title": "(非文化中心)202508.14Thu09.01Mon指尖的溫度‧粉彩（The Warmth Of Finger Tips）",
-      "price": "免票入場",
-      "location": "中興文化創意園區",
-      "category": "展覽",
-      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=610",
+      "title": "202509.10Wed12.31Wed培育台語家庭計畫：註冊申請五大提醒！宣傳註冊方法",
+      "price": "未知",
+      "location": "宜蘭文學館",
+      "category": "活動",
+      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=647",
       "images": [
         {
-          "url": "https://yilanart.ilccb.gov.tw/upload/event/202508071103171313.png",
-          "alt": "指尖的溫度‧粉彩（The Warmth Of Finger Tips）圖示"
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202509100911139468.png",
+          "alt": "培育台語家庭計畫：註冊申請五大提醒！圖示"
         },
         {
-          "url": "https://yilanart.ilccb.gov.tw/upload/event/202508071103166881.png",
-          "alt": "宜蘭縣粉彩畫美術學會展覽海報圖示"
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202509100911132139.jpg",
+          "alt": "台語家庭註冊申五大提醒-1圖示"
+        },
+        {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202509100911137643.jpg",
+          "alt": "台語家庭註冊申五大提醒-2圖示"
+        },
+        {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202509100911137330.jpg",
+          "alt": "台語家庭註冊申五大提醒-3圖示"
+        },
+        {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202509100911134301.jpg",
+          "alt": "台語家庭註冊申五大提醒-4圖示"
+        },
+        {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202509100911133446.jpg",
+          "alt": "台語家庭註冊申五大提醒-5圖示"
         }
       ],
-      "crawl_time": "2025-09-01 13:39:04"
+      "crawl_time": "2025-10-07 22:44:03"
     },
     {
-      "title": "(非文化中心)202508.19Tue09.10Wed寶寶書巡迴展",
-      "price": "免票入場",
-      "location": "頭城親子館",
-      "category": "展覽",
-      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=619",
+      "title": "202509.10Wed12.31Wed培育台語家庭計畫：註冊申請五大提醒！宣傳註冊方法",
+      "price": "未知",
+      "location": "其他地點",
+      "category": "活動",
+      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=648",
       "images": [
         {
-          "url": "https://yilanart.ilccb.gov.tw/upload/event/202508250934586054.jpg",
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202509221443471305.jpg",
+          "alt": "培育台語家庭計畫：註冊申請五大提醒！圖示"
+        },
+        {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/20250910095110670.jpg",
+          "alt": "台語家庭註冊申五大提醒-1圖示"
+        },
+        {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202509100951108606.jpg",
+          "alt": "台語家庭註冊申五大提醒-2圖示"
+        },
+        {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/20250910095110225.jpg",
+          "alt": "台語家庭註冊申五大提醒-3圖示"
+        },
+        {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202509100951104684.jpg",
+          "alt": "台語家庭註冊申五大提醒-4圖示"
+        },
+        {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202509100951117004.jpg",
+          "alt": "台語家庭註冊申五大提醒-5圖示"
+        }
+      ],
+      "crawl_time": "2025-10-07 22:44:03"
+    },
+    {
+      "title": "(非文化中心)202509.11Thu10.07Tue寶寶書巡迴展",
+      "price": "免票入場",
+      "location": "礁溪親子館",
+      "category": "展覽",
+      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=645",
+      "images": [
+        {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202509191452003570.png",
           "alt": "寶寶書巡迴展圖示"
         }
       ],
-      "crawl_time": "2025-09-01 13:39:04"
+      "crawl_time": "2025-10-07 22:44:03"
     },
     {
-      "title": "202509.05Fri蘭燈之星2025新逸交響樂團年度公演",
-      "price": "線上購票",
-      "location": "宜蘭演藝廳",
-      "category": "表演",
-      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=631",
+      "title": "影片202509.20Sat11.23Sun2025紙廠電影院-中興57影展",
+      "price": "免票入場",
+      "location": "中興文化創意園區",
+      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=673",
       "images": [
         {
-          "url": "https://yilanart.ilccb.gov.tw/upload/event/202508251713591862.jpg",
-          "alt": "蘭燈之星2025新逸交響樂團年度公演圖示"
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202509231002597286.png",
+          "alt": "2025紙廠電影院-中興57影展圖示"
+        },
+        {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202509231002585574.png",
+          "alt": "57影展圖示"
         }
       ],
-      "crawl_time": "2025-09-01 13:39:04"
+      "crawl_time": "2025-10-07 22:44:03"
     },
     {
-      "title": "202509.07Sun驢子逃跑了",
+      "title": "(非文化中心)202509.25Thu10.13Mon拾捌～啦！2025年宜蘭縣藝術學會會員聯展",
       "price": "免票入場",
-      "location": "羅東文化工場",
-      "category": "表演",
-      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=609",
+      "location": "中興文化創意園區",
+      "category": "展覽",
+      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=674",
       "images": [
         {
-          "url": "https://yilanart.ilccb.gov.tw/upload/event/202508061722198614.jpg",
-          "alt": "驢子逃跑了圖示"
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202509231154105663.png",
+          "alt": "拾捌～啦！2025年宜蘭縣藝術學會會員聯展圖示"
+        },
+        {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202509231154097465.png",
+          "alt": "拾捌～啦！ 2025年宜蘭縣藝術學會會員聯展 海報圖示"
         }
       ],
-      "crawl_time": "2025-09-01 13:39:05"
+      "crawl_time": "2025-10-07 22:44:03"
     },
     {
-      "title": "202509.07Sun手掌畫兔子（手作）、律動、蠟筆小黑找妖怪、好餓好餓的小白熊",
+      "title": "(非文化中心)202509.27Sat10.12Sun2025宜蘭潮流文化藝術祭－潮嶼新生",
       "price": "免票入場",
-      "location": "羅東鎮圖仁愛館",
-      "category": "故事",
-      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=630",
-      "images": [],
-      "crawl_time": "2025-09-01 13:39:05"
+      "location": "中興文化創意園區",
+      "category": "展覽",
+      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=677",
+      "images": [
+        {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202509301158272450.png",
+          "alt": "2025宜蘭潮流文化藝術祭－潮嶼新生圖示"
+        }
+      ],
+      "crawl_time": "2025-10-07 22:44:03"
     },
     {
-      "title": "202509.07Sun律動、台語童謠、超神奇糖果舖、請假、手指謠（台語）、月亮是什麼味道道、貝蒂",
+      "title": "(非文化中心)202510.01Wed10.30Thu2025 讀出健康力──運動養生書展",
       "price": "免票入場",
       "location": "化龍一村",
-      "category": "故事",
-      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=634",
-      "images": [],
-      "crawl_time": "2025-09-01 13:39:05"
+      "category": "展覽",
+      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=657",
+      "images": [
+        {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202509211453444619.jpg",
+          "alt": "2025 讀出健康力──運動養生書展圖示"
+        }
+      ],
+      "crawl_time": "2025-10-07 22:44:03"
     },
     {
-      "title": "202509.13Sat漢陽北管劇團推廣保存演出 北管大戲《南陽郡》",
+      "title": "(非文化中心)202510.01Wed10.30Thu2025 樂齡生活書展",
       "price": "免票入場",
-      "location": "其他地點",
-      "category": "表演",
-      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=625",
+      "location": "化龍一村",
+      "category": "展覽",
+      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=658",
       "images": [
         {
-          "url": "https://yilanart.ilccb.gov.tw/upload/event/202508211201489856.jpg",
-          "alt": "漢陽北管劇團114年下半演出海報圖示"
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202509211457017468.jpg",
+          "alt": "2025 樂齡生活書展圖示"
         }
       ],
-      "crawl_time": "2025-09-01 13:39:05"
+      "crawl_time": "2025-10-07 22:44:03"
     },
     {
-      "title": "202509.13Sat跨樂‧拾光—蘭陽薩克斯風重奏團十週年音樂會",
-      "price": "線上購票",
-      "location": "宜蘭演藝廳",
-      "category": "表演",
-      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=637",
+      "title": "(非文化中心)202510.01Wed11.09Sun2025宜蘭美術獎得獎作品展",
+      "price": "免票入場",
+      "location": "羅東文化工場",
+      "category": "展覽",
+      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=680",
       "images": [
         {
-          "url": "https://yilanart.ilccb.gov.tw/upload/event/202508260909072948.jpg",
-          "alt": "跨樂‧拾光—蘭陽薩克斯風重奏團十週年音樂會圖示"
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202510021452521608.jpg",
+          "alt": "文化工場官網圖示"
+        },
+        {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202510021452523829.jpg",
+          "alt": "文化工場FB圖示"
         }
       ],
-      "crawl_time": "2025-09-01 13:39:05"
+      "crawl_time": "2025-10-07 22:44:03"
     },
     {
-      "title": "202509.13Sat蘭來推台語—剪紙藝術須事先報名",
-      "price": "未知",
-      "location": "宜蘭文學館",
-      "category": "研習",
-      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=640",
+      "title": "202510.10Fri10.11Sat2025宜蘭潮流文化藝術祭",
+      "price": "免票入場",
+      "location": "中興文化創意園區",
+      "category": "活動",
+      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=691",
       "images": [
         {
-          "url": "https://yilanart.ilccb.gov.tw/upload/event/202508271140087730.jpg",
-          "alt": "蘭來推台語—剪紙藝術圖示"
-        }
-      ],
-      "crawl_time": "2025-09-01 13:39:05"
-    },
-    {
-      "title": "202509.14Sun2025光輝古典x宜蘭愛樂索票入場",
-      "price": "未知",
-      "location": "宜蘭演藝廳",
-      "category": "表演",
-      "url": "https://yilanart.ilccb.gov.tw/index.php?inter=activity&did=638",
-      "images": [
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202510030848376509.jpg",
+          "alt": "2025宜蘭潮流文化藝術祭圖示"
+        },
         {
-          "url": "https://yilanart.ilccb.gov.tw/upload/event/202508260920539291.jpg",
-          "alt": "2025光輝古典x宜蘭愛樂圖示"
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202510030848357713.jpg",
+          "alt": "潮流文化藝術祭活動表1圖示"
+        },
+        {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202510030848357923.jpg",
+          "alt": "潮流文化藝術祭活動表2圖示"
+        },
+        {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202510030848362863.jpg",
+          "alt": "展區1樓「訊號現場」圖示"
+        },
+        {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202510030848365816.jpg",
+          "alt": "展區2樓「潛意幻層」圖示"
+        },
+        {
+          "url": "https://yilanart.ilccb.gov.tw/upload/event/202510030848373129.jpg",
+          "alt": "展區3樓「錯位組裝」圖示"
         }
       ],
-      "crawl_time": "2025-09-01 13:39:05"
+      "crawl_time": "2025-10-07 22:44:04"
     }
   ]
 }
