@@ -71,7 +71,7 @@ jobs:
       
       - name: 📈 上傳爬取統計
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: crawl-logs-${{ github.run_number }}
           path: |
